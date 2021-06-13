@@ -1,0 +1,101 @@
+#how many orders are placed in the "Breakfast" cuisine
+#how many users ordered from the "Breakfast" cuisine
+SELECT
+  b.city,
+  b.Breakfast_orders,
+  b.Breakfast_Users
+FROM (
+  SELECT
+    city,
+    COUNT(DISTINCT order_id) AS Breakfast_orders,
+    COUNT(DISTINCT user_id) AS Breakfast_Users
+  FROM
+    `bi-2019-test.ad_hoc.orders_jan2021`
+  WHERE
+    city IN (
+    SELECT
+      a.city
+    FROM (
+      SELECT
+        city,
+        COUNT(DISTINCT order_id) AS NOorders
+      FROM
+        `bi-2019-test.ad_hoc.orders_jan2021`
+      GROUP BY
+        city ) AS a
+    WHERE
+      a.NOorders>=500 )
+    AND cuisine_parent='Breakfast'
+  GROUP BY
+    city )AS b
+ORDER BY
+  b.Breakfast_orders DESC
+LIMIT
+  10;
+  
+#what is the Average Basket of the Breakfast_Users that we defined before?  
+SELECT
+  c.city,
+  d.user_id,
+  d.avg_basket
+FROM (
+  SELECT
+    b.city
+  FROM (
+    SELECT
+      city,
+      COUNT(DISTINCT order_id) AS Breakfast_orders
+    FROM
+      `bi-2019-test.ad_hoc.orders_jan2021`
+    WHERE
+      city IN (
+      SELECT
+        a.city
+      FROM (
+        SELECT
+          city,
+          COUNT(DISTINCT order_id) AS NOorders
+        FROM
+          `bi-2019-test.ad_hoc.orders_jan2021`
+        GROUP BY
+          city ) AS a
+      WHERE
+        a.NOorders>=500 )
+      AND cuisine_parent='Breakfast'
+    GROUP BY
+      city )AS b
+  ORDER BY
+    b.Breakfast_orders DESC
+  LIMIT
+    10) AS c
+LEFT JOIN (
+  SELECT
+    e.city,
+    e.user_id,
+    g.avg_basket
+  FROM (
+    SELECT
+      city,
+      user_id,
+    FROM
+      `bi-2019-test.ad_hoc.orders_jan2021`
+    WHERE
+      user_id IN (
+      SELECT
+        user_id
+      FROM
+        `bi-2019-test.ad_hoc.orders_jan2021`
+      WHERE
+        cuisine_parent='Breakfast')) AS e
+  LEFT JOIN (
+    SELECT
+      user_id,
+      AVG(basket) AS avg_basket
+    FROM
+      `bi-2019-test.ad_hoc.orders_jan2021`
+    GROUP BY
+      user_id) AS g
+  ON
+    e.user_id=g.user_id ) AS d
+ON
+  c.city=d.city;  
