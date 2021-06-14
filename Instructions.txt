@@ -1,0 +1,13 @@
+Part B analysis was developed explicitly in python. In order to run it, open a cmd and type the below:
+
+Cd <Code Location Path>
+Python <Code Name > <Location Path of orders_jan21 csv file>
+
+Once you execute the command, you will see the results in the console.
+
+Alternatively, you can comment out line 10 and pass the Location Path of orders_jan21 csv file replacing sys.argv[1] in line 11. 
+#Script=sys.argv[0]
+DataSet=<Location of the orders_jan21 csv file>
+
+Then execute the code using an IDE of your choise.
+Please also note that some parts of the analysis have been commented out e.g. plots, but you can uncomment them in case you want to execute them separately.
